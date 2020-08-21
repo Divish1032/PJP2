@@ -1,0 +1,1 @@
+mvn help --log-file log.txt
