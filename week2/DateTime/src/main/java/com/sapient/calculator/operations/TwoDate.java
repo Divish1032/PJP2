@@ -5,6 +5,8 @@ import java.util.Scanner;
 
 import com.sapient.calculator.CommonMethod;
 import com.sapient.calculator.models.DateInput;
+import com.sapient.calculator.persistance.Query;
+
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
@@ -12,31 +14,52 @@ import org.joda.time.Period;
 public class TwoDate extends CommonMethod{
     private DateTime t1, t2;
     private Scanner temp;
+    private Query query;
 
-    public TwoDate(Scanner d){
+    public TwoDate(Scanner d, Query q){
         this.temp = d;
+        this.query = q;
     }
 
 
-	public void init() {
+	public Query init() {
+        // set query start time to now
+        query.setQueryStartTime(new DateTime());
+        // set type of query
+        query.setType(1);
+
         // Boiler plate message for type 1 operation
         boilerplateMessage();
         // input choice
         int choice = inputChoice(temp);
+
+        // set format
+        query.setFormat(choice);
+
         // Take input from user for two dates.
         try {
             DateInput date = new DateInput(temp, choice);
             this.t1 = date.init();
+            query.setDate1(this.t1);
             // if null returned then some exception occured
-            if(this.t1 == null) System.exit(0);   
+            if(this.t1 == null){
+                query.setError(true);
+                return query;
+            }
             
             DateInput date2 = new DateInput(temp, choice);
             this.t2 = date2.init();
+            query.setDate2(this.t2);
+            
             // if null returned then some exception occured
-            if(this.t2 == null) System.exit(0);   
+            if(this.t2 == null){
+                query.setError(true);
+                return query;
+            } 
         } catch (Exception e) {
             sop(e.getMessage());
-            System.exit(0); 
+            query.setError(true);
+            return query;  
         }  
 
         // Choice of operation to be applied to the two dates
@@ -45,6 +68,8 @@ public class TwoDate extends CommonMethod{
         sop("Enter 2 for substraction of dates");    
         choice = inputChoice(temp);
         executeOperation(choice);
+
+        return query;
     }
 
     public void boilerplateMessage() {
@@ -64,6 +89,12 @@ public class TwoDate extends CommonMethod{
         sop("Days: " + res.getDayOfYear());
         sop("Weeks: " + res.getWeekOfWeekyear());
         sop("Month: " + res.getMonthOfYear());
+
+        String result = "Date: " + res.toLocalDate() + "\n" +
+        "Days: " + res.getDayOfYear() + "\n" +
+        "Weeks: " + res.getWeekOfWeekyear() + "\n" + 
+        "Month: " + res.getMonthOfYear();
+        query.setResult(result);
         return;
     }
 
@@ -73,19 +104,30 @@ public class TwoDate extends CommonMethod{
             sop("Days: " + dif.getDays());
             sop("Weeks: " + dif.getWeeks());
             sop("Month: " + dif.getMonths());
+
+            String result =
+            "Days: " + dif.getDays() + "\n" +
+            "Weeks: " + dif.getWeeks() + "\n" + 
+            "Month: " + dif.getMonths();
+            query.setResult(result);
+
             return;
         }
         sop("Invalid date substraction.");
+        query.setResult("Invalid date substraction.");
+
         return;
     }
 
     public void executeOperation(int choice) {
         HashMap<Integer, Runnable> map = new HashMap<>();
         map.put(1, () -> {
+            query.setAddition(true);
             sop("Result after addition is: ");
             addition();
         });
         map.put(2, () -> {
+            query.setAddition(false);
             sop("Result after substraction is: ");
             subtraction();
         });

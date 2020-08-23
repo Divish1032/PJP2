@@ -4,36 +4,54 @@ import com.sapient.calculator.CommonMethod;
 import java.util.Scanner;
 
 import com.sapient.calculator.models.DateInput;
+import com.sapient.calculator.persistance.Query;
 
 import org.joda.time.DateTime;
 
 public class WeekNumber extends CommonMethod {
     private DateTime t1;
     private final Scanner temp;
+    private Query query;
 
-    public WeekNumber(final Scanner d) {
+    public WeekNumber(Scanner d, Query q) {
         this.temp = d;
+        this.query = q;
     }
 
-    public void init() {
+    public Query init() {
+        // set query start time to now
+        query.setQueryStartTime(new DateTime());
+        // set type of query
+        query.setType(4);
+        
         // Boiler plate message for type 1 operation
         boilerplateMessage();
         // input choice
         int choice = inputChoice(temp);
-        // Take input from user for a specific dates.
 
+        // set format
+        query.setFormat(choice);
+
+        // Take input from user for a specific dates.
         try {
              // input specified date
              DateInput date = new DateInput(temp, choice);
              this.t1 = date.init();
- 
+             query.setDate1(this.t1);
              // if null returned then some exception occured
-             if(this.t1 == null) System.exit(0);
+             if(this.t1 == null){ 
+                 query.setError(true);
+                 return query;
+             } 
         } catch (Exception e) {
             sop(e.getMessage());
+            query.setError(true);
+            return query; 
         }  
 
         sop("Number of the week of the given date is: " + executeOperation());
+        query.setResult("Number of the week of the given date is: " + executeOperation());
+        return query;
     }
 
     public int executeOperation() {

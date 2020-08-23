@@ -3,6 +3,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Scanner;
 import com.sapient.calculator.CommonMethod;
+import com.sapient.calculator.persistance.Query;
+
 import java.util.HashMap;
 import java.util.function.Consumer;
 import org.joda.time.DateTime;
@@ -12,13 +14,15 @@ public class NLP extends CommonMethod{
     private String txt;
     DateTime date;
     HashMap<String, Consumer<Integer>> translator;
+    Query query;
+    private final Scanner temp;
 
-
-    public NLP(){
+    public NLP(Scanner d, Query q){
         this.txt = "";
         this.date = new DateTime();
         this.translator = new HashMap<>();
-        input();
+        this.query = q;
+        this.temp = d;
     }
 
 
@@ -39,13 +43,18 @@ public class NLP extends CommonMethod{
     }
 
     public void input() {
-        Scanner d = new Scanner(System.in);
-        sopSL("Enter a phrase to be translated to date: ");
-        this.txt = d.nextLine();
-        d.close();
+        // set query start time to now
+        query.setQueryStartTime(new DateTime());
+        // set type of query
+        query.setType(5);
     }
 
-    public void translator(){
+    public Query translator(){
+        input();
+        sopSL("Enter a phrase to be translated to date: ");
+        this.txt = temp.next();
+        query.setPhrase(this.txt);
+
         txt = txt.toLowerCase();
 
         // Find if there is any digit
@@ -61,9 +70,14 @@ public class NLP extends CommonMethod{
         // check if given input is present or not
         if(translator.containsKey(txt)){
             translator.get(txt).accept(number);
+            query.setResult(date.toString());
         } else {
-            sop("We tranlator is not able to understand the given text, please stay with us, we are improving our algorithm.");
+            String res = "Our tranlator is not able to understand the given text, please stay with us, we are improving our algorithm.";
+            sop(res);
+            query.setResult(res);
         }
+
+        return query;
     }
 
 
