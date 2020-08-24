@@ -1,19 +1,30 @@
 package com.sapient.calculator.persistance;
 
-import org.joda.time.DateTime;
+import java.sql.Timestamp;
+import java.util.UUID;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
-public class Query {
+@Entity
+public class Queries {
+    
+    @Id
+    String id;
     int type;
-    DateTime date1, date2;
+    Timestamp date1, date2;
     int format;
     int n;
     String phrase;
-    DateTime queryStartTime, queryEndTime;
+    Timestamp queryStartTime, queryEndTime;
     String result;
-    Session session;
+    @Embedded
+    Sessions session;
     Boolean error, addition;
 
-    public Query() {
+    public Queries() {
+        this.id = UUID.randomUUID().toString();
         this.date1 = null;
         this.date2 = null;
         this.n = 0;
@@ -31,19 +42,19 @@ public class Query {
         this.type = type;
     }
 
-    public DateTime getDate1() {
+    public Timestamp getDate1() {
         return date1;
     }
 
-    public void setDate1(DateTime date1) {
+    public void setDate1(Timestamp date1) {
         this.date1 = date1;
     }
 
-    public DateTime getDate2() {
+    public Timestamp getDate2() {
         return date2;
     }
 
-    public void setDate2(DateTime date2) {
+    public void setDate2(Timestamp date2) {
         this.date2 = date2;
     }
 
@@ -63,19 +74,19 @@ public class Query {
         this.phrase = phrase;
     }
 
-    public DateTime getQueryStartTime() {
+    public Timestamp getQueryStartTime() {
         return queryStartTime;
     }
 
-    public void setQueryStartTime(DateTime queryStartTime) {
+    public void setQueryStartTime(Timestamp queryStartTime) {
         this.queryStartTime = queryStartTime;
     }
 
-    public DateTime getQueryEndTime() {
+    public Timestamp getQueryEndTime() {
         return queryEndTime;
     }
 
-    public void setQueryEndTime(DateTime queryEndTime) {
+    public void setQueryEndTime(Timestamp queryEndTime) {
         this.queryEndTime = queryEndTime;
     }
 
@@ -87,11 +98,11 @@ public class Query {
         this.result = result;
     }
 
-    public Session getSession() {
+    public Sessions getSession() {
         return session;
     }
 
-    public void setSession(Session session) {
+    public void setSession(Sessions session) {
         this.session = session;
     }
 

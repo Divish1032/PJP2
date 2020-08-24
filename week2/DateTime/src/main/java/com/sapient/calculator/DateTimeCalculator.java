@@ -1,40 +1,62 @@
 package com.sapient.calculator;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import com.sapient.calculator.models.AutomatedQuery;
 import com.sapient.calculator.operations.DayWeek;
 import com.sapient.calculator.operations.NDays;
 import com.sapient.calculator.operations.NLP;
 import com.sapient.calculator.operations.TwoDate;
 import com.sapient.calculator.operations.WeekNumber;
-import com.sapient.calculator.persistance.Query;
-import com.sapient.calculator.persistance.Session;
+import com.sapient.calculator.persistance.Queries;
+import com.sapient.calculator.persistance.Sessions;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 import org.joda.time.DateTime;
 
 
 public class DateTimeCalculator extends CommonMethod {
 
-    Session ses;
+    com.sapient.calculator.persistance.Sessions ses;
     Scanner d;
+    Session session;
+    static AutomatedQuery aq = null;
 
-    public DateTimeCalculator(){
-        this.ses = new Session();
-        this.d = new Scanner(System.in);
+    public DateTimeCalculator(Scanner d){
+        this.ses = new Sessions();
+        this.d = d;
+        Configuration con = new Configuration().configure().addAnnotatedClass(Queries.class).addAnnotatedClass(Sessions.class);
+        
+        ServiceRegistry reg = new ServiceRegistryBuilder().applySettings(con.getProperties()).buildServiceRegistry();
+        SessionFactory sf = con.buildSessionFactory(reg);
+        this.session = sf.openSession();
     }
 
     public void start(){
+        
+        this.session.beginTransaction();
+
 
         // Session started 
-        this.ses.setStartTime(new DateTime());
+        this.ses.setStartTime(new Timestamp( new DateTime().getMillis()));
         this.ses.setStart(true);
+        
+        this.session.save(this.ses);
         while (this.ses.getStart() == true) {
             init();
         }
-        this.ses.setEndTime(new DateTime());
+
+        this.ses.setEndTime(new Timestamp( new DateTime().getMillis()));
+
+        this.session.getTransaction().commit();
         this.d.close();
+        this.session.close();
     }
 
     public void init(){
@@ -45,8 +67,10 @@ public class DateTimeCalculator extends CommonMethod {
         
         // Get input from user for his choice of the operation
         choice = this.d.next();
+        
         // clearing the console for better visualization
         //clearConsole();
+
         if(choice.equals("quit")){
             sop("Session ended");
             this.ses.setStart(false);
@@ -68,45 +92,46 @@ public class DateTimeCalculator extends CommonMethod {
 
     public void checkOperation(int choice, Scanner d) {
         HashMap<Integer, Runnable> map = new HashMap<>();
+        
         map.put(1, () -> {
-            Query query = new Query();
+            Queries query = new Queries();
             query.setSession(this.ses);
-            TwoDate operation = new TwoDate(d, query);
+            TwoDate operation = new TwoDate(d, query, aq);
             query = operation.init();
-            query.setQueryEndTime(new DateTime());
-            sop(query.toString());
+            query.setQueryEndTime(new Timestamp( new DateTime().getMillis()));
+            session.save(query);
         });
         map.put(2, () -> {
-            Query query = new Query();
+            Queries query = new Queries();
             query.setSession(this.ses);
-            NDays ndays = new NDays(d, query);
+            NDays ndays = new NDays(d, query, aq);
             query = ndays.init();
-            query.setQueryEndTime(new DateTime());
-            sop(query.toString());
+            query.setQueryEndTime(new Timestamp( new DateTime().getMillis()));
+            session.save(query);
         });
         map.put(3, () -> {
-            Query query = new Query();
+            Queries query = new Queries();
             query.setSession(this.ses);
-            DayWeek dw = new DayWeek(d, query);
+            DayWeek dw = new DayWeek(d, query, aq);
             query =  dw.init(); 
-            query.setQueryEndTime(new DateTime());
-            sop(query.toString());
+            query.setQueryEndTime(new Timestamp( new DateTime().getMillis()));
+            session.save(query);
         });
         map.put(4, () -> {
-            Query query = new Query();
+            Queries query = new Queries();
             query.setSession(this.ses);
-            WeekNumber wn = new WeekNumber(d, query);
+            WeekNumber wn = new WeekNumber(d, query, aq);
             query =  wn.init(); 
-            query.setQueryEndTime(new DateTime());
-            sop(query.toString()); 
+            query.setQueryEndTime(new Timestamp( new DateTime().getMillis()));
+            session.save(query);
         });
         map.put(5, () -> {
-            Query query = new Query();
+            Queries query = new Queries();
             query.setSession(this.ses);
-            NLP nlp = new NLP(d, query);
+            NLP nlp = new NLP(d, query, aq);
             query = nlp.translator();
-            query.setQueryEndTime(new DateTime());
-            sop(query.toString());
+            query.setQueryEndTime(new Timestamp( new DateTime().getMillis()));
+            session.save(query);
         });
         
         Runnable action = map.get(choice);
@@ -117,6 +142,10 @@ public class DateTimeCalculator extends CommonMethod {
             sop("--------------------------------------------------------");
             return;
         }
+    }
+
+    public static void setAutomatedQuery(AutomatedQuery temp) {
+        aq = temp;
     }
 
     public static void introDisplay() {

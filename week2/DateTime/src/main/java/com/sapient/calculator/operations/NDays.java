@@ -1,43 +1,55 @@
 package com.sapient.calculator.operations;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Scanner;
 
 import com.sapient.calculator.CommonMethod;
+import com.sapient.calculator.models.AutomatedQuery;
 import com.sapient.calculator.models.DateInput;
-import com.sapient.calculator.persistance.Query;
+import com.sapient.calculator.persistance.Queries;
 
 import org.joda.time.DateTime;
 
 public class NDays extends CommonMethod{
     private DateTime t1;
     private final Scanner temp;
-    private Query query;
+    private Queries query;
+    private AutomatedQuery aq;
 
-    public NDays(Scanner d, Query q) {
+    public NDays(Scanner d, Queries q, AutomatedQuery aq) {
         this.temp = d;
         this.query = q;
+        this.aq = aq;
     }
 
-    public Query init() {
+    public Queries init() {
         // set query start time to now
-        query.setQueryStartTime(new DateTime());
+        query.setQueryStartTime(new Timestamp( new DateTime().getMillis()));
         // set type of query
         query.setType(2);
         
-        // Boiler plate message for type 1 operation
-        boilerplateMessage();
-
-        // input choice for type of format of the date
-        int choice = inputChoice(temp);
-
+        int choice;
+        if(this.aq == null)  {
+            // Boiler plate message for type 1 operation
+            boilerplateMessage();
+            choice = inputChoice(temp);
+        }else{
+            choice = aq.getFormat();
+        } 
+        
         // set format
         query.setFormat(choice);
         try {
             // input specified date
-            DateInput date = new DateInput(temp, choice);
-            this.t1 = date.init();
-            query.setDate1(this.t1);
+            if(this.aq == null){
+                DateInput date = new DateInput(temp, choice);
+                this.t1 = date.init();
+             }
+             else{
+                 this.t1 = aq.getDate1();
+            }
+            query.setDate1(new Timestamp( this.t1.getMillis()));
 
             // if null returned then some exception occured
             if(this.t1 == null){
@@ -51,16 +63,23 @@ public class NDays extends CommonMethod{
         }
 
         // input for add/minus of n days from specified date
-        sop("Enter value of n");
-        final int value = temp.nextInt();
-        query.setN(value);
+        int value;
+        if(this.aq == null){
+            sop("Enter value of n");
+            value = temp.nextInt();
+            query.setN(value);
+            sop("Select operation to be operated on the dates");
+            sop("Enter 1 for addtion of value of n from given date.");
+            sop("Enter 2 for substraction of value of n from given date.");
 
-        sop("Select operation to be operated on the dates");
-        sop("Enter 1 for addtion of value of n from given date.");
-        sop("Enter 2 for substraction of value of n from given date.");
-
-        // Choice of operation to be applied to the two dates
-        choice = inputChoice(temp);
+            // Choice of operation to be applied to the two dates
+            choice = inputChoice(temp);
+         }
+         else{
+             value = aq.getN();
+             query.setN(value);
+             choice = aq.getAddition() ? 1 : 2;
+        }
 
         // Execture the type of operation to be done on the date
         executeOperation(choice, value);
@@ -74,9 +93,13 @@ public class NDays extends CommonMethod{
         final DateTime day = this.t1.plusDays(n);
         final DateTime week = this.t1.plusWeeks(n);
         final DateTime month = this.t1.plusMonths(n);
-        sop("Date afer adding "+ n +" days: " + day.toLocalDate());
-        sop("Date afer adding "+ n +" weeks: " + week.toLocalDate());
-        sop("Date afer adding "+ n +" months: " + month.toLocalDate());
+
+        if(aq == null){
+            sop("Result after addition is: ");
+            sop("Date afer adding "+ n +" days: " + day.toLocalDate());
+            sop("Date afer adding "+ n +" weeks: " + week.toLocalDate());
+            sop("Date afer adding "+ n +" months: " + month.toLocalDate());
+        }
         String result = "Date afer adding "+ n +" days: " + day.toLocalDate() + "\n" +
          "Date afer adding "+ n +" weeks: " + week.toLocalDate() + "\n" +
          "Date afer adding "+ n +" months: " + month.toLocalDate();
@@ -89,9 +112,13 @@ public class NDays extends CommonMethod{
         final DateTime day = this.t1.minusDays(n);
         final DateTime week = this.t1.minusWeeks(n);
         final DateTime month = this.t1.minusMonths(n);
-        sop("Date afer subtracting n days: " + day.toLocalDate());
-        sop("Date afer subtracting n weeks: " + week.toLocalDate());
-        sop("Date afer subtracting n months: " + month.toLocalDate());
+
+        if(aq ==null) {
+            sop("Result after substraction is: ");
+            sop("Date afer subtracting n days: " + day.toLocalDate());
+            sop("Date afer subtracting n weeks: " + week.toLocalDate());
+            sop("Date afer subtracting n months: " + month.toLocalDate());
+        }
 
         String result = "Date afer subtracting "+ n +" days: " + day.toLocalDate() + "\n" +
          "Date afer subtracting "+ n +" weeks: " + week.toLocalDate() + "\n" +
@@ -105,12 +132,10 @@ public class NDays extends CommonMethod{
         HashMap<Integer, Runnable> map = new HashMap<>();
         map.put(1, () -> {
             query.setAddition(true);
-            sop("Result after addition is: ");
             addition(n);
         });
         map.put(2, () -> {
             query.setAddition(false);
-            sop("Result after substraction is: ");
             subtraction(n);
         });
 
