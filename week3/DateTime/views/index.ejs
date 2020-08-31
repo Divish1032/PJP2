@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DateTimeCalculator</title>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+         rel = "stylesheet">
+    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="stylesheets/style.css">
+      <!-- Javascript -->
+      <script>
+         
+      </script>
+</head>
+<body>
+
+  <div class="jumbotron">
+    <h1 class="display-4">DateTime Calculator</h1>
+    <p class="lead">Pick an option to start with the application.</p>
+    <hr class="my-4">
+    <div class="form-group">
+      <label for="method">Select Operation</label>
+      <select class="form-control" aria-selected="0" name="method" id="method">
+        <option value="1">Select</option>
+        <option value="2">Select for addition/subtraction of two dates.</option>
+        <option value="3">Select for addition/subtraction of n days/weeks/months to a given date.</option>
+        <option value="4">Select to determine day of the week of a given date.</option>
+        <option value="5">Select to determine week number of a given date.</option>
+        <option value="6">Select to translate natural language phrases</option>
+      </select>
+    </div>
+
+    <div class="operation" style="margin: 30px auto;">
+      <h5 style="text-align: center;">Input Values</h5>
+      <div id="date1" class="form-group in">
+        <label for="datepicker-13">Enter Date 1: </label>
+        <input class="form-control" type = "text" name="date1" id = "datepicker-13">
+      </div>
+      <div  id="date2" class="form-group in">
+        <label for="datepicker-14">Enter Date 2: </label>
+        <input class="form-control" type = "text" name="date2" id = "datepicker-14">
+      </div>
+
+      <div class="row in" id="n">
+        <div class="col-sm-6">
+          <div>
+            <label for="n">N</label>
+            <input type="number" class="form-control" name="nday" id="nday" placeholder="5">
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label for="ntype">Select type</label>
+            <select class="form-control" id="ntype" name="ntype">
+              <option value="1">Day</option>
+              <option value="2">Week</option>
+              <option value="3">Month</option>
+              <option value="4">Year</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="radio in row" style="margin: 0;">
+        <div class="form-check col-sm-6">
+          <input style="margin-top: 2px;" class="form-check-input" type="radio" name="opt" id="exampleRadios1" value="1" checked>
+          <label class="form-check-label" for="exampleRadios1">
+            Addition
+          </label>
+        </div>
+        <div class="form-check col-sm-6">
+          <input style="margin-top: 2px;" class="form-check-input" type="radio" name="opt" id="exampleRadios2" value="2">
+          <label class="form-check-label" for="exampleRadios2">
+            Substraction
+          </label>
+        </div>
+      </div>
+      <div class="form-group in" id="phrase">
+        <label for="phraset">Phrase</label>
+        <input type="text" class="form-control" name="phrase" id="phraset" placeholder="Tomorrow">
+      </div>
+      <button type="button" style="margin-top: 20px;" class="btn btn-dark submit">Submit</button>
+    </div>
+
+    <div class="result">
+    </div>
+    
+
+ 
+  </div>
+  <script>
+    $( "#datepicker-13" ).removeAttr("autofocus");
+  </script>
+
+<div id="google_translate_element"></div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL}, 'google_translate_element');
+}
+</script>
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
+  <script src="javascripts/script.js"></script>
+</body>
+</html>
